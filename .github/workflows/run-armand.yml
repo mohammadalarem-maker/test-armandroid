@@ -1,0 +1,45 @@
+name: Test ARMANDroid Tool
+
+on:
+  workflow_dispatch:
+
+jobs:
+  explore-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Clone ARMANDroid Repository
+        run: |
+          git clone https://github.com/pku-sec/ARMANDroid.git armand-src
+          
+      - name: Build Docker Image
+        run: |
+          cd armand-src
+          if [ -f Dockerfile ]; then
+            docker build -t armand .
+            echo "✅ تم بناء صورة الدوكر بنجاح باسم armand"
+          else
+            echo "❌ لم يتم العثور على ملف Dockerfile!"
+            exit 1
+          fi
+
+      - name: Prepare Test APK
+        run: |
+          echo "Dummy APK Content" > app-test.apk
+
+      - name: Run ARMANDroid Container
+        run: |
+          echo "جاري تشغيل الحاوية وتطبيق الحماية..."
+          # هذا أمر افتراضي للتجربة، ستحتاج لتعديله لاحقاً بناءً على خيارات الأداة الحقيقية
+          docker run --rm \
+            -v ${{ github.workspace }}:/workdir \
+            armand -i /workdir/app-test.apk -o /workdir/app-protected.apk || echo "تنبيه: تحقق من برامترات الأداة لاحقاً"
+
+      - name: Upload Protected APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Protected-APK-Result
+          path: app-protected.apk

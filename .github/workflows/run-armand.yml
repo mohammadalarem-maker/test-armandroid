@@ -11,21 +11,11 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # جلب أداة Obfuscapk المفتوحة والمضمونة
-      - name: Clone Obfuscapk Repository
-        run: |
-          git clone https://github.com/ClaudiuGeorgiu/Obfuscapk.git obfuscapk-src
-          
-      - name: Build Docker Image
-        run: |
-          cd obfuscapk-src
-          docker build -t obfuscapk .
-
       - name: Prepare Test APK
         run: |
           echo "Dummy APK Content" > app-test.apk
 
-      # تشغيل أداة التعتيم (أمر افتراضي للتأكد من عمل الحاوية)
+      # تشغيل الأداة مباشرة من Docker Hub واستعراض كود المساعدة (Help)
       - name: Run Obfuscapk Container
         run: |
-          docker run --rm obfuscapk --help
+          docker run --rm claudiugeorgiu/obfuscapk --help
